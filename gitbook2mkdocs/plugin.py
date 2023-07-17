@@ -14,7 +14,7 @@ class Gitbook2Mkdocs(BasePlugin):
         markdown = self.replace_figures_with_images(markdown)
 
         # Replace all references to .gitbook directory with assets
-        markdown = markdown.replace(".gitbook/assets/", "assets/gbtomk/")
+        markdown = markdown.replace(".gitbook/assets/", "gbassets/")
 
         return markdown
 
@@ -23,7 +23,7 @@ class Gitbook2Mkdocs(BasePlugin):
         source_dir = os.path.join(config["docs_dir"], ".gitbook", "assets")
 
         # Define the destination directory (assets/images)
-        dest_dir = os.path.join(config["docs_dir"], "assets", "gbtomk")
+        dest_dir = os.path.join(config["docs_dir"], "gbassets")
 
         # Create a symbolic link to avoid warnings in the build process
         if os.path.exists(source_dir) and not os.path.exists(dest_dir):
@@ -34,10 +34,10 @@ class Gitbook2Mkdocs(BasePlugin):
         source_dir = os.path.join(config["docs_dir"], ".gitbook", "assets")
 
         # Define the destination directory (site/assets/images)
-        dest_dir = os.path.join(config["site_dir"], "assets", "gbtomk")
+        dest_dir = os.path.join(config["site_dir"], "gbassets")
 
         # Define the destination directory (assets/gbtomk)
-        symlink = os.path.join(config["docs_dir"], "assets", "gbtomk")
+        symlink = os.path.join(config["docs_dir"], "gbassets")
 
         # If the source directory exists, copy it to the destination
         if os.path.exists(source_dir):

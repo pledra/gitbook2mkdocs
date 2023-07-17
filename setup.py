@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="gitbook2mkdocs",
-    version="0.0.2",
+    version="0.0.3",
     description="MkDocs plugin for converting gitbook syntax to mkdocs",
     keywords="mkdocs markdown gitbook",
     url="https://github.com/pledra/gitbook2mkdocs/",
