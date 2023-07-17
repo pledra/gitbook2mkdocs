@@ -14,31 +14,41 @@ class Gitbook2Mkdocs(BasePlugin):
         markdown = self.replace_figures_with_images(markdown)
 
         # Replace all references to .gitbook directory with assets
-        markdown = markdown.replace(
-            ".gitbook/assets/", self.get_relative_path_to_assets(page)
-        )
+        markdown = markdown.replace(".gitbook/assets/", "assets/gbtomk/")
 
         return markdown
 
-    def on_post_build(self, config):
+    def on_pre_build(self, config, **kwargs):
+        # Define the source directory (.gitbook/assets)
+        source_dir = os.path.join(config["docs_dir"], ".gitbook", "assets")
+
+        # Define the destination directory (assets/images)
+        dest_dir = os.path.join(config["docs_dir"], "assets", "gbtomk")
+
+        # Create a symbolic link to avoid warnings in the build process
+        if os.path.exists(source_dir) and not os.path.exists(dest_dir):
+            os.symlink(source_dir, dest_dir)
+
+    def on_post_build(self, config, **kwargs):
         # Define the source directory (.gitbook/assets)
         source_dir = os.path.join(config["docs_dir"], ".gitbook", "assets")
 
         # Define the destination directory (site/assets/images)
         dest_dir = os.path.join(config["site_dir"], "assets", "gbtomk")
+        
+        # Define the destination directory (assets/gbtomk)
+        symlink = os.path.join(config['docs_dir'], 'assets', 'gbtomk')
 
         # If the source directory exists, copy it to the destination
         if os.path.exists(source_dir):
             shutil.copytree(source_dir, dest_dir, dirs_exist_ok=True)
+            
+        # If the destination directory exists, remove it
+        if os.path.exists(symlink):
+            os.remove(symlink)
 
         # No need to replace .gitbook/assets/ with assets/ in HTML files
         # because that's handled in on_page_markdown
-
-    def get_relative_path_to_assets(self, page):
-        # Count the number of slashes in the page URL to determine its depth
-        depth = page.file.url.count("/") - 1
-        # Construct a relative path to the assets directory based on the depth
-        return "../" * depth + "assets/gbtomk/"
 
     # Function to replace GitBook syntax with MkDocs Admonition syntax
     def replace_gitbook_syntax(self, content):
