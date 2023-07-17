@@ -6,7 +6,7 @@ from mkdocs.plugins import BasePlugin
 
 
 class Gitbook2Mkdocs(BasePlugin):
-    def on_page_markdown(self, markdown, page, config, files):
+    def on_page_markdown(self, markdown, page, config, files, **kwargs):
         # Replace GitBook syntax with MkDocs syntax
         markdown = self.replace_gitbook_syntax(markdown)
 
@@ -35,14 +35,14 @@ class Gitbook2Mkdocs(BasePlugin):
 
         # Define the destination directory (site/assets/images)
         dest_dir = os.path.join(config["site_dir"], "assets", "gbtomk")
-        
+
         # Define the destination directory (assets/gbtomk)
-        symlink = os.path.join(config['docs_dir'], 'assets', 'gbtomk')
+        symlink = os.path.join(config["docs_dir"], "assets", "gbtomk")
 
         # If the source directory exists, copy it to the destination
         if os.path.exists(source_dir):
             shutil.copytree(source_dir, dest_dir, dirs_exist_ok=True)
-            
+
         # If the destination directory exists, remove it
         if os.path.exists(symlink):
             os.remove(symlink)
@@ -107,11 +107,16 @@ class Gitbook2Mkdocs(BasePlugin):
 
         return content
 
-    def replace_figures_with_images(self, content):
-        pattern = r'<figure><img src="(.*?)" alt="(.*?)"><figcaption><p>.*?</p></figcaption></figure>'
-        replacement = r"![\2](\1)"
-        content = re.sub(pattern, replacement, content)
-        return content
+    def replace_figures_with_images(self, markdown):
+        # Find all occurrences of <figure><img src="..."><figcaption>...</figcaption></figure>
+        # and replace them with ![...](...)
+        markdown = re.sub(
+            r'<figure><img src="(.*?)" alt="(.*?)"><figcaption>.*?</figcaption></figure>',
+            r"![\2](\1)",
+            markdown,
+        )
+
+        return markdown
 
     # Function to remove escaping characters between colons
     def remove_escaping_chars(self, content):
